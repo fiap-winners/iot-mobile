@@ -1,48 +1,82 @@
 package br.com.fiap.trackmed
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.RemoteException
 import android.view.View
+import android.text.format.DateFormat
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_detection.*
 import org.altbeacon.beacon.*
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.round
 
 class DetectionActivity : AppCompatActivity(), BeaconConsumer {
 
-    private var beaconManager: BeaconManager? = null
-    private val PERMISSION_REQUEST_COARSE_LOCATION = 1
+    private val AGENT_ID = "nome@email.com"
 
-    private val TRACKMED_BEACON = "aa"
-    private val TYPE_BED = "00"
-    private val TYPE_FOUNTAIN = "01"
-    private val TYPE_HYGIENIZING_DISPENSER = "02"
-    private val TYPE_BALCONY = "03"
-    private val TYPE_VENDING_MACHINE = "04"
-    private val TYPE_COMPUTER = "05"
-    private val TYPE_CABINET = "06"
-    private val TYPE_LOCKERS = "07"
-    private val TYPE_BULLETIN_BOARD = "08"
-    private val TYPE_TIME_ATTENDANCE_REGISTER = "09"
-    private val TYPE_MACHINE_01 = "0a"
-    private val TYPE_MACHINE_02 = "0b"
-    private val TYPE_MACHINE_03 = "0c"
+    private var beaconManager: BeaconManager? = null
+    private val region: Region = Region("TrackMedRegion", null, null, null)
+
+    private val PERMISSION_REQUEST_COARSE_LOCATION  = 1
+
+    private val TRACKMED_BEACON                 = "aa"
+    private val TYPE_BED                        = "00"
+    private val TYPE_FOUNTAIN                   = "01"
+    private val TYPE_HYGIENIZING_DISPENSER      = "02"
+    private val TYPE_BALCONY                    = "03"
+    private val TYPE_VENDING_MACHINE            = "04"
+    private val TYPE_COMPUTER                   = "05"
+    private val TYPE_CABINET                    = "06"
+    private val TYPE_LOCKERS                    = "07"
+    private val TYPE_BULLETIN_BOARD             = "08"
+    private val TYPE_TIME_ATTENDANCE_REGISTER   = "09"
+    private val TYPE_MACHINE_01                 = "0a"
+    private val TYPE_MACHINE_02                 = "0b"
+    private val TYPE_MACHINE_03                 = "0c"
+
+    private val beaconTypeDescription = mapOf(TYPE_BED                      to "Leito",
+                                              TYPE_FOUNTAIN                 to "Bebedouro",
+                                              TYPE_HYGIENIZING_DISPENSER    to "Dispenser",
+                                              TYPE_BALCONY                  to "Recepção",
+                                              TYPE_VENDING_MACHINE          to "Máquina de vends",
+                                              TYPE_COMPUTER                 to "Computador",
+                                              TYPE_CABINET                  to "Armário",
+                                              TYPE_LOCKERS                  to "Vestiário",
+                                              TYPE_BULLETIN_BOARD           to "Quadro de avisos",
+                                              TYPE_TIME_ATTENDANCE_REGISTER to "Relógio de ponto",
+                                              TYPE_MACHINE_01               to "Máquina 1",
+                                              TYPE_MACHINE_02               to "Máquina 2",
+                                              TYPE_MACHINE_03               to "Máquina 3")
 
     private val MIN_SECONDS_TO_RECORD = 2
-    private val MAX_DISTANCE_TO_SHOW_DETECTION = 10
+    private val MAX_DISTANCE_FOR_DETECTION = 10
+    private val MAX_DISTANCE_FOR_RECORD = 2
 
     private var lastSeenDateTime: Date = Date()
     private var lastSeenBeaconId: String = ""
     private var lastSeenBeaconDistance: Double = 0.0
     private var lastBeaconIdRecorded: String = ""
 
+    private var db: DatabaseManager? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setContentView(R.layout.activity_detection)
+
+        if (!BluetoothAdapter.getDefaultAdapter().isEnabled) {
+            startActivityForResult(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1)
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // Android M Permission check
@@ -57,9 +91,18 @@ class DetectionActivity : AppCompatActivity(), BeaconConsumer {
                 }
                 builder.show()
             }
+
+            btnClose.setOnClickListener {
+                finishAffinity()
+            }
+
+            btnHistory.setOnClickListener {
+                Toast.makeText(this, this.getString(R.string.not_implemented), Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
 
-        setContentView(R.layout.activity_detection)
+        db = DatabaseManager(this, "TrackHistory")
 
         beaconManager = BeaconManager.getInstanceForApplication(this)
         beaconManager!!.beaconParsers.add(BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_UID_LAYOUT))
@@ -101,47 +144,45 @@ class DetectionActivity : AppCompatActivity(), BeaconConsumer {
             override fun didRangeBeaconsInRegion(beacons: Collection<Beacon>, region: Region) {
                 if (beacons.isNotEmpty()) {
 
-//                    val firstBeacon = beacons.iterator().next()
                     val firstBeacon: Beacon? = beacons.filter { it.id2.toString().substring(2,4) == TRACKMED_BEACON }.minBy { it.distance }
                     if (firstBeacon != null) {
                         runOnUiThread {
                             updateDistance(firstBeacon!!)
                         }
                     }
+                } else {
+                    setBeaconImageInvisible()
                 }
             }
         })
         try {
-            beaconManager!!.startRangingBeaconsInRegion(Region("TrackMedRegion", null, null, null))
+            beaconManager!!.startRangingBeaconsInRegion(region)
         } catch (e: RemoteException) {
         }
     }
+
+
 
     fun updateDistance(beacon: Beacon) {
 
         if (beacon.id1.toString() != lastSeenBeaconId) {
             lastSeenBeaconId = beacon.id1.toString()
             lastSeenDateTime = Date()
-            lastSeenBeaconDistance = beacon.distance
+            lastSeenBeaconDistance = beacon.distance * 100 / 100
 
-            if (lastSeenBeaconDistance > MAX_DISTANCE_TO_SHOW_DETECTION) {
-                imageBeacon.visibility = View.INVISIBLE
-                textDistance.text = "nada"
-                textBeaconId.text = "nada"
+            if (lastSeenBeaconDistance <= MAX_DISTANCE_FOR_DETECTION) {
+                setBeaconImageVisible(beacon)
             } else {
-                imageBeacon.text = getString(getBeaconImage(beacon.id2.toString().substring(4, 6)))
-                imageBeacon.visibility = View.VISIBLE
-                textDistance.text = beacon.distance.toString()
-                textBeaconId.text = beacon.id2.toString().substring(4, 6)
+                setBeaconImageInvisible()
             }
         } else {
 
-            if (lastSeenBeaconId == lastBeaconIdRecorded) {
-                if (beacon.distance >= MAX_DISTANCE_TO_SHOW_DETECTION &&
-                    TimeUnit.MILLISECONDS.toSeconds(Date().time - lastSeenDateTime.time) < MIN_SECONDS_TO_RECORD
-                ) {
+            if (beacon.id1.toString() == lastSeenBeaconId && lastSeenBeaconId != lastBeaconIdRecorded) {
 
-                    // Persistir
+                if (beacon.distance <= MAX_DISTANCE_FOR_RECORD &&
+                    TimeUnit.MILLISECONDS.toSeconds(Date().time - lastSeenDateTime.time) >= MIN_SECONDS_TO_RECORD) {
+
+                    db!!.insertTrack(AGENT_ID, lastSeenBeaconId, beacon.id2.toString().substring(4, 6), TimeUnit.MILLISECONDS.toSeconds(Date().time))
                     lastBeaconIdRecorded = beacon.id1.toString()
                 } else {
                     lastSeenBeaconId = ""
@@ -149,10 +190,11 @@ class DetectionActivity : AppCompatActivity(), BeaconConsumer {
             }
         }
 
-        textLastSeenDateTime.text = lastSeenDateTime.toString()
+        textLastSeenDateTime.text = DateFormat.getDateFormat(this).format(lastSeenDateTime) + " " +
+                                    SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(lastSeenDateTime)
     }
 
-    fun getBeaconImage(beaconType: String): Int {
+    private fun getBeaconTypeImage(beaconType: String): Int {
         return when(beaconType) {
             TYPE_BED -> R.string.fa_procedures_solid
             TYPE_FOUNTAIN -> R.string.fa_water_solid
@@ -169,6 +211,21 @@ class DetectionActivity : AppCompatActivity(), BeaconConsumer {
             TYPE_MACHINE_03 -> R.string.fa_atom_solid
             else -> R.string.fa_ban_solid
         }
+    }
+
+    private fun setBeaconImageInvisible() {
+        imageBeacon.text = getString(getBeaconTypeImage(""))
+        frameBeaconData.visibility = View.INVISIBLE
+    }
+
+    private fun setBeaconImageVisible(beacon: Beacon) {
+        val beaconType: String = beacon.id2.toString().substring(4, 6)
+
+        imageBeacon.text = getString(getBeaconTypeImage(beaconType))
+        textDistance.text = (round(beacon.distance * 100)/100).toString()
+        textBeaconId.text = beaconTypeDescription[beaconType]
+
+        frameBeaconData.visibility = View.VISIBLE
     }
 
 }

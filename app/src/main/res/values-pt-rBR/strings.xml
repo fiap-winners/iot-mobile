@@ -3,4 +3,7 @@
     <string name="beacon_distance">Distância</string>
     <string name="distance_metric">metros</string>
     <string name="last_seen">Visto em</string>
+    <string name="historic">Histórico</string>
+    <string name="close">Fechar</string>
+    <string name="not_implemented">Ainda não implementado!</string>
 </resources>
