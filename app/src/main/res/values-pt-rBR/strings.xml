@@ -2,4 +2,5 @@
 <resources>
     <string name="beacon_distance">Distância</string>
     <string name="distance_metric">metros</string>
+    <string name="last_seen">Visto em</string>
 </resources>
