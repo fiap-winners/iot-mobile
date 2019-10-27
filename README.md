@@ -24,6 +24,14 @@ As duas posições seguintes identificam o tipo de objeto que o *beacon* está r
 |09           |Relógio de ponto|
 |0A           |Máquina 1	 |
 |0B           |Máquina 2	 |
-|0B           |Máquina 3	 |
+|0C           |Máquina 3	 |
 
 > **Exemplo:** AA0500000000 - *Beacon* rastreável pelo TrackMed identificando um computador
+
+## Registro de proximidade
+
+O aplicativo TrackMed exibe o *beacon* mais próximo desde que a distância seja, no máximo, até 10 metros.
+
+O registro de proximidade de um *beacon* é realizado somente se o agente estiver a menos de 2 metros dele por, no mínimo, 2 segundos. Após o registro, se o agente se afastar por mais de 10 metros e se aproximar novamente do mesmo *beacon*, será considerada uma nova aproximação, sendo registrado mais uma vez, mesmo que nenhum outro *beacon* tenha sido detectado nesse período.
+
+> A distância do dispositivo e os *beacons* sofre variação por diversos fatores. Mais informações podem ser obtidas na página da biblioteca [altBeacon](https://altbeacon.github.io/android-beacon-library/distance-calculations.html).
