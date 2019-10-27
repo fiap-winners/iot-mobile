@@ -6,4 +6,17 @@
     <string name="close">Close</string>
     <string name="historic">History</string>
     <string name="not_implemented">Not implemented yet!</string>
+    <string name="bed">Bed</string>
+    <string name="fountain">Fountain</string>
+    <string name="hygienizing_dispenser">Hygienizing dispenser</string>
+    <string name="balcony">Balcony</string>
+    <string name="vending_machine">Vending machine</string>
+    <string name="computer">Computer</string>
+    <string name="cabinet">Cabinet</string>
+    <string name="lockers">Lockers</string>
+    <string name="bulletin_board">Bulletin board</string>
+    <string name="time_attendance_register">Time attendance register</string>
+    <string name="machine_1">Machine 01</string>
+    <string name="machine_2">Machine 02</string>
+    <string name="machine_3">Machine 03</string>
 </resources>

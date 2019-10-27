@@ -44,19 +44,7 @@ class DetectionActivity : AppCompatActivity(), BeaconConsumer {
     private val TYPE_MACHINE_02                 = "0b"
     private val TYPE_MACHINE_03                 = "0c"
 
-    private val beaconTypeDescription = mapOf(TYPE_BED                      to "Leito",
-                                              TYPE_FOUNTAIN                 to "Bebedouro",
-                                              TYPE_HYGIENIZING_DISPENSER    to "Dispenser",
-                                              TYPE_BALCONY                  to "Recepção",
-                                              TYPE_VENDING_MACHINE          to "Máquina de vends",
-                                              TYPE_COMPUTER                 to "Computador",
-                                              TYPE_CABINET                  to "Armário",
-                                              TYPE_LOCKERS                  to "Vestiário",
-                                              TYPE_BULLETIN_BOARD           to "Quadro de avisos",
-                                              TYPE_TIME_ATTENDANCE_REGISTER to "Relógio de ponto",
-                                              TYPE_MACHINE_01               to "Máquina 1",
-                                              TYPE_MACHINE_02               to "Máquina 2",
-                                              TYPE_MACHINE_03               to "Máquina 3")
+    private var beaconTypeDescription = mapOf<String, String>()
 
     private val MIN_SECONDS_TO_RECORD = 2
     private val MAX_DISTANCE_FOR_DETECTION = 10
@@ -102,6 +90,20 @@ class DetectionActivity : AppCompatActivity(), BeaconConsumer {
             }
         }
 
+        beaconTypeDescription = mapOf(TYPE_BED                      to getString(R.string.bed),
+                                      TYPE_FOUNTAIN                 to getString(R.string.fountain),
+                                      TYPE_HYGIENIZING_DISPENSER    to getString(R.string.hygienizing_dispenser),
+                                      TYPE_BALCONY                  to getString(R.string.balcony),
+                                      TYPE_VENDING_MACHINE          to getString(R.string.vending_machine),
+                                      TYPE_COMPUTER                 to getString(R.string.computer),
+                                      TYPE_CABINET                  to getString(R.string.cabinet),
+                                      TYPE_LOCKERS                  to getString(R.string.lockers),
+                                      TYPE_BULLETIN_BOARD           to getString(R.string.bulletin_board),
+                                      TYPE_TIME_ATTENDANCE_REGISTER to getString(R.string.time_attendance_register),
+                                      TYPE_MACHINE_01               to getString(R.string.machine_1),
+                                      TYPE_MACHINE_02               to getString(R.string.machine_2),
+                                      TYPE_MACHINE_03               to getString(R.string.machine_3))
+
         db = DatabaseManager(this, "TrackHistory")
 
         beaconManager = BeaconManager.getInstanceForApplication(this)
@@ -126,11 +128,6 @@ class DetectionActivity : AppCompatActivity(), BeaconConsumer {
                 return
             }
         }
-/*
-        companion object {
-            protected val TAG = "DetectionActitity"
-        }
-*/
     }
 
 
