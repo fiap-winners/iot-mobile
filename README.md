@@ -1,8 +1,16 @@
 # TrackMed
 
-Sistema de registro de proximidade de um agente em relação a pontos de interesse de monitoramento em ambiente hospitalar. Usando beacons para identificar os pontos a serem monitorados dentro de um hospital, é possível estimar a proximidade de médicos, enfermeiros, prestadores de serviços etc. em relação a esses locais como leitos, dispensers de líquidos higienizantes, bebedouros, equipamentos médicos, portas ou salas.
+Sistema de registro de proximidade de um agente em relação a pontos de interesse de monitoramento em ambiente hospitalar. Usando beacons para identificar os pontos a serem monitorados dentro de um hospital, é possível estimar a proximidade de médicos, enfermeiros, prestadores de serviços etc. em relação a esses locais como leitos, *dispensers* de líquidos higienizantes, bebedouros, equipamentos médicos, portas ou salas.
 
 Além da observação do padrão de deslocamento, esses dados podem ser utilizados para colaborar com os protocolos de controle de infecção ou na tentativa de reconstruir inversamente a disseminação de algum patógeno dentro do ambiente hospitalar.
+
+### Para testar o funcionamento
+
+- Instale em um segundo celular o aplicativo [Beacon Simulator](https://play.google.com/store/apps/details?id=net.alea.beaconsimulator)
+- Configure quantos *beacons* desejar, conforme a quantidade e diversidade de objetos que deseje rastrear.
+- Observe a configuração da identificação dos *beacons* conforme as instruções abaixo
+- Ligue um beacon de cada vez, desligando o anterior, simulando o deslocamento de uma pessoa dentro de um ambiente. Nada impede que mais de um *beacon* esteja ligado ao mesmo tempo, pois na vida real o aplicativo irá registrar o mais próximo, mas como todos os *beacons* virtuais estarão na mesma distância pode ser que o mesmo *beacon* não seja detectado durante o tempo mínimo para ser registrado
+- Após ligar e desligar albuns *beacons* clique no botão "Histórico" para verificar quais foram registrados
 
 ## *Beacons*
 
