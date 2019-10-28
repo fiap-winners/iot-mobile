@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.RemoteException
 import android.view.View
 import android.text.format.DateFormat
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_detection.*
@@ -35,6 +36,8 @@ class DetectionActivity : AppCompatActivity(), BeaconConsumer {
     private var lastSeenBeaconId: String = ""
     private var lastSeenBeaconDistance: Double = 0.0
     private var lastBeaconIdRecorded: String = ""
+
+    private var detectionFlag: Boolean = false
 
     companion object {
 
@@ -116,13 +119,14 @@ class DetectionActivity : AppCompatActivity(), BeaconConsumer {
                 if (beacons.isNotEmpty()) {
 
                     val firstBeacon: Beacon? = beacons.filter { it.id2.toString().substring(2,4) == BeaconUtils.TRACKMED_BEACON }.minBy { it.distance }
-                    if (firstBeacon != null) {
+                    if (firstBeacon != null && !detectionFlag) {
                         runOnUiThread {
                             updateDetection(firstBeacon)
                         }
                     }
                 } else {
                     setBeaconImageInvisible()
+
                 }
             }
         })
@@ -133,6 +137,8 @@ class DetectionActivity : AppCompatActivity(), BeaconConsumer {
     }
 
     fun updateDetection(beacon: Beacon) {
+
+        detectionFlag = true
 
         if (beacon.id1.toString() != lastSeenBeaconId) {
             lastSeenBeaconId = beacon.id1.toString()
@@ -151,8 +157,9 @@ class DetectionActivity : AppCompatActivity(), BeaconConsumer {
                 if (beacon.distance <= MAX_DISTANCE_FOR_RECORD &&
                     TimeUnit.MILLISECONDS.toSeconds(Date().time - lastSeenDateTime.time) >= MIN_SECONDS_TO_RECORD) {
 
-                    db!!.insertTrack(AGENT_ID, lastSeenBeaconId, beacon.id2.toString().substring(4, 6), TimeUnit.MILLISECONDS.toSeconds(Date().time))
                     lastBeaconIdRecorded = beacon.id1.toString()
+                    db!!.insertTrack(AGENT_ID, lastSeenBeaconId, beacon.id2.toString().substring(4, 6), TimeUnit.MILLISECONDS.toSeconds(Date().time))
+                    Log.d("TM", "Gravou " + lastBeaconIdRecorded)
                 } else {
                     lastSeenBeaconId = ""
                 }
@@ -161,6 +168,7 @@ class DetectionActivity : AppCompatActivity(), BeaconConsumer {
 
         textLastSeenDateTime.text = DateFormat.getDateFormat(this).format(lastSeenDateTime) + " " +
                                     SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(lastSeenDateTime)
+        detectionFlag = false
     }
 
     private fun setBeaconImageInvisible() {
