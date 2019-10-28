@@ -7,7 +7,7 @@ Além da observação do padrão de deslocamento, esses dados podem ser utilizad
 ### Para testar o funcionamento
 
 - Instale em um segundo celular o aplicativo [Beacon Simulator](https://play.google.com/store/apps/details?id=net.alea.beaconsimulator)
-- Configure quantos *beacons* desejar, conforme a quantidade e diversidade de objetos que deseje rastrear.
+- Adicione quantos *beacons* desejar, conforme a quantidade e diversidade de objetos que deseje rastrear. Escolha sempre do tipo **Eddystone UID**
 - Observe a configuração da identificação dos *beacons* conforme as instruções abaixo
 - Ligue um beacon de cada vez, desligando o anterior, simulando o deslocamento de uma pessoa dentro de um ambiente. Nada impede que mais de um *beacon* esteja ligado ao mesmo tempo, pois na vida real o aplicativo irá registrar o mais próximo, mas como todos os *beacons* virtuais estarão na mesma distância pode ser que o mesmo *beacon* não seja detectado durante o tempo mínimo para ser registrado
 - Após ligar e desligar albuns *beacons* clique no botão "Histórico" para verificar quais foram registrados
