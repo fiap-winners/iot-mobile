@@ -107,6 +107,16 @@ class DetectionActivity : AppCompatActivity(), BeaconConsumer {
     }
 
 
+    override fun onPause() {
+        super.onPause()
+        detectionFlag = true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        detectionFlag = false
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         db!!.close()
