@@ -13,8 +13,10 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <activity android:name=".DetectionActivity">
-
         </activity>
+        <activity android:name=".HistoryActivity">
+        </activity>
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

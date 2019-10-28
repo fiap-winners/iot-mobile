@@ -14,7 +14,7 @@ class DatabaseManager(context: Context, name: String?) : SQLiteOpenHelper(contex
                                       "AgentId VARCHAR(30)," +
                                       "BeaconId VARCHAR(20)," +
                                       "BeaconType VARCHAR(2)," +
-                                      "DetectionTime REAL);"
+                                      "DetectionTime INT);"
         )
     }
 
@@ -26,7 +26,7 @@ class DatabaseManager(context: Context, name: String?) : SQLiteOpenHelper(contex
                                       "AgentId VARCHAR(30)," +
                                       "BeaconId VARCHAR(20)," +
                                       "BeaconType VARCHAR(2)," +
-                                      "DetectionTime REAL);"
+                                      "DetectionTime INT);"
         )
     }
 
@@ -40,13 +40,18 @@ class DatabaseManager(context: Context, name: String?) : SQLiteOpenHelper(contex
         cv.put("BeaconType", BeaconType)
         cv.put("DetectionTime", DetectionTime)
 
-        db.insert("TrachHistory", null, cv)
+        db.insert("TrackHistory", null, cv)
     }
 
     fun queryTrack(agentId: String): Cursor {
 
         val db = this.readableDatabase
-        val cur = db.rawQuery("SELECT AgentId, BeaconId, BeaconType, DetectionTime FROM TrachHistory WHERE agentId = ?", Array<String>(1) {agentId })
+        val cur =
+            db.rawQuery("SELECT AgentId, BeaconId, BeaconType, DetectionTime " +
+                             "FROM TrackHistory " +
+                             "WHERE agentId = ? " +
+                             "ORDER BY DetectionTime DESC",
+                Array<String>(1) {agentId })
 
         return cur
     }
